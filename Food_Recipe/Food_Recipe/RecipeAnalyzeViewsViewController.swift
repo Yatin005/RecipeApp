@@ -15,8 +15,6 @@ class RecipeAnalyzeViewsViewController: UIViewController {
     @IBOutlet weak var readyInMinutesLabel: UILabel!
     @IBOutlet weak var instructionsTextView: UITextView!
     @IBOutlet weak var ingri: UITextView!
-    
-   
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
 
     var recipeId: Int?
@@ -96,6 +94,17 @@ class RecipeAnalyzeViewsViewController: UIViewController {
             imageView.image = UIImage(systemName: "photo")
         }
     }
+    @IBAction func showSimilarRecipesTapped(_ sender: UIButton) {
+            guard let recipeId = self.recipeId else {
+                // This should not happen if the button is only enabled when recipeId is set
+                return
+            }
+
+            if let similarVC = storyboard?.instantiateViewController(withIdentifier: "SimilarRecipesViewController") as? SimilarRecipesViewController {
+                similarVC.recipeId = recipeId
+                navigationController?.pushViewController(similarVC, animated: true)
+            }
+        }
 
     private func displayError(_ error: Error) {
         let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)

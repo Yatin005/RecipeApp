@@ -8,6 +8,9 @@
 // RecipeService.swift
 import Foundation
 class RecipeService: RecipeServiceProtocol {
+    
+
+    
     private let baseURL = URL(string: "https://api.spoonacular.com/")!
     private let apiKey = "c0d3df26f25b4695a8ad33d4c7838012"
 
@@ -28,7 +31,7 @@ class RecipeService: RecipeServiceProtocol {
         }
 
         let (data, response) = try await URLSession.shared.data(from: url)
-        return try handleResponse(data: data, response: response, decodingType: RecipeSearchResponse.self).results ?? []
+        return try handleResponse(data: data, response: response, decodingType: RecipeSearchResponse.self).results
     }
 
     func getRecipeInformation(id: Int) async throws -> RecipeDetailModel {
@@ -49,18 +52,14 @@ class RecipeService: RecipeServiceProtocol {
         return try handleResponse(data: data, response: response, decodingType: [RecipeDetailModel].self)
     }
 
-    func analyzeRecipe(instructions: String) async throws -> RecipeAnalysisResponse {
-        guard let url = URL(string: "\(baseURL)recipes/analyze?apiKey=\(apiKey)") else {
+    func getSimilarRecipes(id: [Int]) async throws -> [SimilarRecipe] {
+        guard let url = URL(string: "\(baseURL)recipes/\(id)/similar?apiKey=\(apiKey)") else {
             throw APIError.invalidURL
         }
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        let parameters: [String: Any] = ["instructions": instructions]
-        request.httpBody = try JSONSerialization.data(withJSONObject: parameters)
-        let (data, response) = try await URLSession.shared.data(for: request)
-        return try handleResponse(data: data, response: response, decodingType: RecipeAnalysisResponse.self)
+        let (data, response) = try await URLSession.shared.data(from: url)
+        return try handleResponse(data: data, response: response, decodingType: [SimilarRecipe].self)
     }
+    
 
     private func handleResponse<T: Decodable>(data: Data, response: URLResponse, decodingType: T.Type) throws -> T {
         guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {

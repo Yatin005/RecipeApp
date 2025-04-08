@@ -60,7 +60,6 @@ struct RecipeDetailModel: Decodable {
 }
 
 
-
 struct ExtendedIngredient: Decodable {
     let aisle: String?
     let amount: Double?
@@ -72,6 +71,14 @@ struct ExtendedIngredient: Decodable {
     let original: String?
     let originalName: String?
     let unit: String?
+}
+struct SimilarRecipe: Decodable{
+    let id: Int
+    let title: String?
+    let imageType: String?
+    let readyInMinutes: Int?
+    let servings: Int?
+    let sourceUrl: String?
 }
 
 // MARK: - Recipe Analysis Response Model (Based on your earlier request)
