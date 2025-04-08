@@ -17,7 +17,7 @@ class Api_Network {
 
     var newsDelegate: NewsDelegate?
 
-    private let newsApiKey = "YOUR_NEWS_API_KEY" // Replace with your actual News API key
+    private let newsApiKey = "YOUR_NEWS_API_KEY" 
     private let newsBaseURL = URL(string: "https://newsapi.org/v2")!
 
     // MARK: - News API Integration
