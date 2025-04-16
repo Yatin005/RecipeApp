@@ -4,6 +4,7 @@
 //
 //  Created by Yatin Parulkar on 2025-04-07.
 //
+
 import Foundation
 
 // MARK: - Recipe Search Response Model
@@ -72,7 +73,8 @@ struct ExtendedIngredient: Codable {
     let originalName: String?
     let unit: String?
 }
-struct SimilarRecipe: Codable{
+
+struct SimilarRecipe: Codable {
     let id: Int
     let title: String?
     let imageType: String?
@@ -80,7 +82,7 @@ struct SimilarRecipe: Codable{
     let servings: Int?
     let sourceUrl: String?
 }
-// MARK: - Recipe Analysis Response Model (Based on your earlier request)
+
 struct RecipeAnalysisResponse: Codable {
     let id: Int?
     let title: String?
@@ -89,10 +91,13 @@ struct RecipeAnalysisResponse: Codable {
     let instructions: String?
 }
 
+
+
 // MARK: - API Error Enumeration
 enum APIError: Error {
     case invalidURL
-    case requestFailed(Error)
+    case requestFailed(Error, statusCode: Int?) // Include status code
     case invalidData
     case decodingFailed(Error)
+    case apiLimitReached(message: String) // For API limit errors
 }

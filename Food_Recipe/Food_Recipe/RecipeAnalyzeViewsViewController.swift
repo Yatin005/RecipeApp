@@ -8,7 +8,7 @@
 import UIKit
 
 class RecipeAnalyzeViewsViewController: UIViewController {
-
+    
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var servingsLabel: UILabel!
@@ -17,7 +17,15 @@ class RecipeAnalyzeViewsViewController: UIViewController {
     @IBOutlet weak var ingri: UITextView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
 
-    var recipeId: Int?
+
+    var recipeId: Int? {
+        didSet {
+            print("RecipeAnalyzeViewsViewController - recipeId set to: \(recipeId ?? -1)")
+            if isViewLoaded { // Check if the view is loaded before potentially triggering UI updates
+                loadRecipeDetails(forId: recipeId)
+            }
+        }
+    }
     private let recipeService = RecipeService()
 
     override func viewDidLoad() {
@@ -25,13 +33,23 @@ class RecipeAnalyzeViewsViewController: UIViewController {
         title = "Recipe Details"
         activityIndicator.isHidden = false
         activityIndicator.startAnimating()
-        loadRecipeDetails()
+        if let id = recipeId {
+            loadRecipeDetails(forId: id)
+        } else {
+            print("RecipeAnalyzeViewsViewController - viewDidLoad - recipeId is nil initially.")
+            activityIndicator.stopAnimating()
+            activityIndicator.isHidden = true
+            // Handle the case where recipeId wasn't set before viewDidLoad if needed
+        }
     }
 
-    private func loadRecipeDetails() {
-        guard let recipeId = self.recipeId else {
+    private func loadRecipeDetails(forId id: Int?) {
+        guard let recipeId = id else {
+            print("RecipeAnalyzeViewsViewController - loadRecipeDetails - recipeId is nil, cannot load.")
             DispatchQueue.main.async {
-                self.displayError(APIError.invalidURL) 
+                self.activityIndicator.stopAnimating()
+                self.activityIndicator.isHidden = true
+                self.displayError(APIError.invalidURL)
             }
             return
         }
@@ -94,34 +112,37 @@ class RecipeAnalyzeViewsViewController: UIViewController {
             imageView.image = UIImage(systemName: "photo")
         }
     }
+
     @IBAction func showSimilarRecipesTapped(_ sender: UIButton) {
-        guard let recipeId = self.recipeId else {
-               print("Error: recipeId is nil when trying to show similar recipes.")
-               return
-           }
-
-           print("Attempting to show similar recipes for recipe ID: \(recipeId)")
-
-           if let similarVC = storyboard?.instantiateViewController(withIdentifier: "SimilarRecipeViewController") as? SimilarRecipeViewController {
-               print("Successfully instantiated SimilarRecipesViewController.")
-               similarVC.recipeId = recipeId
-               print("Set similarVC.recipeId to: \(similarVC.recipeId ?? -1)") // Print the value being set
-
-               if let navController = navigationController {
-                   print("Navigation controller is available. Pushing SimilarRecipesViewController.")
-                   navController.pushViewController(similarVC, animated: true)
-               } else {
-                   print("Error: Navigation controller is nil. Cannot push SimilarRecipesViewController.")
-                  
-               }
-           } else {
-               print("Error: Could not instantiate SimilarRecipesViewController from Storyboard. Check the Storyboard ID.")
-           }
+        guard let currentRecipeId = self.recipeId else {
+            print("RecipeAnalyzeViewsViewController - Error: recipeId is nil when trying to show similar recipes.")
+            return
         }
+
+        print("RecipeAnalyzeViewsViewController - showSimilarRecipesTapped - Calling performSegue with recipeId: \(currentRecipeId)")
+        performSegue(withIdentifier: "next", sender: currentRecipeId)
+    }
 
     private func displayError(_ error: Error) {
         let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
+    }
+
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        print("RecipeAnalyzeViewsViewController - prepare(for segue:) called with identifier: \(segue.identifier ?? "nil") and sender: \(String(describing: sender))")
+        if segue.identifier == "next",
+           let similarVC = segue.destination as? SimilarRecipeViewController,
+           let recipeIdToSend = sender as? Int {
+            similarVC.recipeId = recipeIdToSend
+            print("RecipeAnalyzeViewsViewController - prepare(for segue:) - Successfully passed recipeId: \(recipeIdToSend) to SimilarRecipeViewController.")
+        } else {
+            print("RecipeAnalyzeViewsViewController - prepare(for segue:) - Condition not met or cast failed.")
+            if segue.destination is SimilarRecipeViewController {
+                print("RecipeAnalyzeViewsViewController - prepare(for segue:) - Destination VC is SimilarRecipeViewController, but sender was of type: \(String(describing: sender))")
+            } else {
+                print("RecipeAnalyzeViewsViewController - prepare(for segue:) - Destination VC is NOT SimilarRecipeViewController.")
+            }
+        }
     }
 }

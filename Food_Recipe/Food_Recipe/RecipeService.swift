@@ -11,7 +11,7 @@ class RecipeService: RecipeServiceProtocol {
 
     
     private let baseURL = URL(string: "https://api.spoonacular.com/")!
-    private let apiKey = "c0d3df26f25b4695a8ad33d4c7838012"
+    private let apiKey = "918ca8dc86aa4245b68375e588a81e3c"
 
     func searchRecipes(query: String) async throws -> [Recipe] {
         guard var components = URLComponents(url: baseURL.appendingPathComponent("recipes/complexSearch"), resolvingAgainstBaseURL: true) else {
@@ -52,10 +52,14 @@ class RecipeService: RecipeServiceProtocol {
     }
 
     func getSimilarRecipes(id: Int) async throws -> [SimilarRecipe] {
+        print(id)
+        
+        
         let urlString = "\(baseURL)recipes/\(id)/similar?apiKey=\(apiKey)"
                 guard let url = URL(string: urlString) else {
                     throw APIError.invalidURL
                 }
+        print(urlString)
                 print("Similar Recipes API URL: \(url)") // Added for debugging
                 let (data, response) = try await URLSession.shared.data(from: url)
                 return try handleResponse(data: data, response: response, decodingType: [SimilarRecipe].self)
@@ -81,12 +85,7 @@ class RecipeService: RecipeServiceProtocol {
         }
         print("-----------------------------")
 
-        guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
-            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? -1
-            print("Request failed with HTTP status code: \(statusCode)")
-            throw APIError.requestFailed(NSError(domain: "HTTPError", code: statusCode, userInfo: nil))
-        }
-
+      
         do {
             let decoder = JSONDecoder()
             let decodedObject = try decoder.decode(decodingType, from: data)
