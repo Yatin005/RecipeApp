@@ -7,14 +7,14 @@
 import Foundation
 
 // MARK: - Recipe Search Response Model
-struct RecipeSearchResponse: Decodable {
+struct RecipeSearchResponse: Codable {
     let results: [Recipe]
     let offset: Int?
     let number: Int?
     let totalResults: Int?
 }
 
-struct Recipe: Decodable, Identifiable {
+struct Recipe: Codable, Identifiable {
     let id: Int
     let title: String?
     let image: String?
@@ -22,7 +22,7 @@ struct Recipe: Decodable, Identifiable {
 }
 
 // MARK: - Recipe Detail Model
-struct RecipeDetailModel: Decodable {
+struct RecipeDetailModel: Codable {
     let id: Int?
     let title: String?
     let image: String?
@@ -60,7 +60,7 @@ struct RecipeDetailModel: Decodable {
 }
 
 
-struct ExtendedIngredient: Decodable {
+struct ExtendedIngredient: Codable {
     let aisle: String?
     let amount: Double?
     let consistency: String?
@@ -72,7 +72,7 @@ struct ExtendedIngredient: Decodable {
     let originalName: String?
     let unit: String?
 }
-struct SimilarRecipe: Decodable{
+struct SimilarRecipe: Codable{
     let id: Int
     let title: String?
     let imageType: String?
@@ -80,9 +80,8 @@ struct SimilarRecipe: Decodable{
     let servings: Int?
     let sourceUrl: String?
 }
-
 // MARK: - Recipe Analysis Response Model (Based on your earlier request)
-struct RecipeAnalysisResponse: Decodable {
+struct RecipeAnalysisResponse: Codable {
     let id: Int?
     let title: String?
     let servings: Int?

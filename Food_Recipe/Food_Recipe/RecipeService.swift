@@ -8,7 +8,6 @@
 // RecipeService.swift
 import Foundation
 class RecipeService: RecipeServiceProtocol {
-    
 
     
     private let baseURL = URL(string: "https://api.spoonacular.com/")!
@@ -52,23 +51,51 @@ class RecipeService: RecipeServiceProtocol {
         return try handleResponse(data: data, response: response, decodingType: [RecipeDetailModel].self)
     }
 
-    func getSimilarRecipes(id: [Int]) async throws -> [SimilarRecipe] {
-        guard let url = URL(string: "\(baseURL)recipes/\(id)/similar?apiKey=\(apiKey)") else {
-            throw APIError.invalidURL
-        }
-        let (data, response) = try await URLSession.shared.data(from: url)
-        return try handleResponse(data: data, response: response, decodingType: [SimilarRecipe].self)
+    func getSimilarRecipes(id: Int) async throws -> [SimilarRecipe] {
+        let urlString = "\(baseURL)recipes/\(id)/similar?apiKey=\(apiKey)"
+                guard let url = URL(string: urlString) else {
+                    throw APIError.invalidURL
+                }
+                print("Similar Recipes API URL: \(url)") // Added for debugging
+                let (data, response) = try await URLSession.shared.data(from: url)
+                return try handleResponse(data: data, response: response, decodingType: [SimilarRecipe].self)
     }
     
 
-    private func handleResponse<T: Decodable>(data: Data, response: URLResponse, decodingType: T.Type) throws -> T {
-        guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
-            throw APIError.requestFailed(NSError(domain: "HTTPError", code: (response as? HTTPURLResponse)?.statusCode ?? -1, userInfo: nil))
+
+    private func handleResponse<T: Codable>(data: Data, response: URLResponse, decodingType: T.Type) throws -> T {
+        print("--- API Response Analysis ---")
+
+        if let httpResponse = response as? HTTPURLResponse {
+            print("HTTP Status Code: \(httpResponse.statusCode)")
+        } else {
+            print("Received a non-HTTP response.")
         }
+
+        // Print the raw data
+        print("--- Raw API Response Data ---")
+        if let responseString = String(data: data, encoding: .utf8) {
+            print(responseString)
+        } else {
+            print("Unable to decode response data as UTF-8.")
+        }
+        print("-----------------------------")
+
+        guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? -1
+            print("Request failed with HTTP status code: \(statusCode)")
+            throw APIError.requestFailed(NSError(domain: "HTTPError", code: statusCode, userInfo: nil))
+        }
+
         do {
             let decoder = JSONDecoder()
-            return try decoder.decode(decodingType, from: data)
+            let decodedObject = try decoder.decode(decodingType, from: data)
+            print("Successfully decoded data to \(decodingType)")
+            return decodedObject
         } catch {
+            print("--- Decoding Error ---")
+            print(error)
+            print("----------------------")
             throw APIError.decodingFailed(error)
         }
     }

@@ -7,7 +7,7 @@
 
 import UIKit
 
-class SimilarRecipesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class SimilarRecipeViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
     @IBOutlet weak var similarRecipesTableView: UITableView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
@@ -44,7 +44,7 @@ class SimilarRecipesViewController: UIViewController, UITableViewDataSource, UIT
                 DispatchQueue.main.async {
                     self.activityIndicator.stopAnimating()
                     self.activityIndicator.isHidden = true
-                    self.similarRecipes = fetchedSimilarRecipes
+                    
                     self.similarRecipesTableView.reloadData()
                 }
             } catch {

@@ -95,15 +95,28 @@ class RecipeAnalyzeViewsViewController: UIViewController {
         }
     }
     @IBAction func showSimilarRecipesTapped(_ sender: UIButton) {
-            guard let recipeId = self.recipeId else {
-                // This should not happen if the button is only enabled when recipeId is set
-                return
-            }
+        guard let recipeId = self.recipeId else {
+               print("Error: recipeId is nil when trying to show similar recipes.")
+               return
+           }
 
-            if let similarVC = storyboard?.instantiateViewController(withIdentifier: "SimilarRecipesViewController") as? SimilarRecipesViewController {
-                similarVC.recipeId = recipeId
-                navigationController?.pushViewController(similarVC, animated: true)
-            }
+           print("Attempting to show similar recipes for recipe ID: \(recipeId)")
+
+           if let similarVC = storyboard?.instantiateViewController(withIdentifier: "SimilarRecipeViewController") as? SimilarRecipeViewController {
+               print("Successfully instantiated SimilarRecipesViewController.")
+               similarVC.recipeId = recipeId
+               print("Set similarVC.recipeId to: \(similarVC.recipeId ?? -1)") // Print the value being set
+
+               if let navController = navigationController {
+                   print("Navigation controller is available. Pushing SimilarRecipesViewController.")
+                   navController.pushViewController(similarVC, animated: true)
+               } else {
+                   print("Error: Navigation controller is nil. Cannot push SimilarRecipesViewController.")
+                  
+               }
+           } else {
+               print("Error: Could not instantiate SimilarRecipesViewController from Storyboard. Check the Storyboard ID.")
+           }
         }
 
     private func displayError(_ error: Error) {

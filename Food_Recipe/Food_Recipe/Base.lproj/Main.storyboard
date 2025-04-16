@@ -152,8 +152,7 @@
                                         <state key="normal" title="Button"/>
                                         <buttonConfiguration key="configuration" style="plain" title="Button"/>
                                         <connections>
-                                            <action selector="showSimilarRecipesTapped:" destination="Oyl-Xk-lJT" eventType="touchUpInside" id="MY1-9o-3EY"/>
-                                            <segue destination="jYA-bC-5sN" kind="show" identifier="next" id="KHY-r7-fw8"/>
+                                            <segue destination="jYA-bC-5sN" kind="show" id="9dU-t0-Ryx"/>
                                         </connections>
                                     </button>
                                 </subviews>
@@ -179,10 +178,10 @@
             </objects>
             <point key="canvasLocation" x="5680.1526717557254" y="-105.63380281690141"/>
         </scene>
-        <!--Similar Recipes View Controller-->
+        <!--Similar Recipe View Controller-->
         <scene sceneID="41Y-P3-yjl">
             <objects>
-                <viewController id="jYA-bC-5sN" customClass="SimilarRecipesViewController" customModule="Food_Recipe" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="jYA-bC-5sN" customClass="SimilarRecipeViewController" customModule="Food_Recipe" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="BHq-dn-heq">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
