@@ -1,70 +1,48 @@
-    //
-    //  SimilarRecipesViewController.swift
-    //  Food_Recipe
-    //
-    //  Created by Yatin Parulkar on 2025-04-07.
-    //
+//
+//  SimilarRecipeViewController.swift
+//  Food_Recipe
+//
+//  Created by Yatin Parulkar on 2025-04-17.
+//
 
 import UIKit
 
 class SimilarRecipeViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
-    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
-    
     @IBOutlet weak var similarRecipesTableView: UITableView!
-    
-    var recipeId: Int? {
-        didSet {
-            print("SimilarRecipeViewController - recipeId didSet to: \(recipeId ?? -1)")
-            loadSimilarRecipes()
-        }
-    }
-    private let recipeService = RecipeService()
-    private var similarRecipes: [SimilarRecipe] = []
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+
+    private let popularRecipeService: RecipeServiceProtocol = RecipeService()
+    private var popularRecipes: [Recipe] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("SimilarRecipeViewController - viewDidLoad called here. Current recipeId: \(recipeId ?? -1)")
-        title = "Similar Recipes"
+        title = "Popular Recipes"
+
         similarRecipesTableView.dataSource = self
         similarRecipesTableView.delegate = self
-        similarRecipesTableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        similarRecipesTableView.register(UITableViewCell.self, forCellReuseIdentifier: "next")
 
         activityIndicator.isHidden = false
         activityIndicator.startAnimating()
 
-    
+        loadPopularRecipes()
     }
 
-    private func loadSimilarRecipes() {
-        print("SimilarRecipeViewController - loadSimilarRecipes - About to check recipeId: \(self.recipeId ?? -2) (-2 indicates nil)")
-        guard let recipeId = self.recipeId else {
-            DispatchQueue.main.async {
-                self.activityIndicator?.stopAnimating()
-                self.activityIndicator?.isHidden = true
-                self.displayError(APIError.invalidURL)
-            }
-            print("SimilarRecipeViewController - loadSimilarRecipes - recipeId is nil, cannot load similar recipes.")
-            return
-        }
-        print("SimilarRecipeViewController - loadSimilarRecipes - recipeId is NOT nil: \(recipeId)")
+    private func loadPopularRecipes() {
         Task {
-            print("SimilarRecipeViewController - loadSimilarRecipes - Inside Task, recipeId: \(recipeId)")
             do {
-                let fetchedRecipes = try await recipeService.getSimilarRecipes(id: recipeId)
+                popularRecipes = try await popularRecipeService.fetchPopularRecipes()
                 DispatchQueue.main.async {
-                    self.activityIndicator?.stopAnimating()
-                    self.activityIndicator?.isHidden = true
-                    self.similarRecipes = fetchedRecipes
+                    self.activityIndicator.stopAnimating()
+                    self.activityIndicator.isHidden = true
                     self.similarRecipesTableView.reloadData()
-                    print("SimilarRecipeViewController - loadSimilarRecipes - Successfully loaded \(self.similarRecipes.count) similar recipes.")
                 }
             } catch {
                 DispatchQueue.main.async {
-                    self.activityIndicator?.stopAnimating()
-                    self.activityIndicator?.isHidden = true
+                    self.activityIndicator.stopAnimating()
+                    self.activityIndicator.isHidden = true
                     self.displayError(error)
-                    print("SimilarRecipeViewController - loadSimilarRecipes - Error loading similar recipes: \(error)")
                 }
             }
         }
@@ -73,38 +51,61 @@ class SimilarRecipeViewController: UIViewController, UITableViewDataSource, UITa
     // MARK: - UITableViewDataSource
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return similarRecipes.count
+        return popularRecipes.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell3", for: indexPath)
-        let similarRecipe = similarRecipes[indexPath.row]
-        cell.textLabel?.text = similarRecipe.title
+        let recipe = popularRecipes[indexPath.row]
+        cell.textLabel?.text = recipe.title
+        cell.imageView?.image = nil // Clear previous image
+
+        if let imageURLString = recipe.image, let imageURL = URL(string: imageURLString) {
+            Task {
+                do {
+                    let (data, _) = try await URLSession.shared.data(from: imageURL)
+                    if let image = UIImage(data: data) {
+                        DispatchQueue.main.async {
+                            if let currentCell = tableView.cellForRow(at: indexPath), currentCell === cell {
+                                cell.imageView?.image = image
+                                cell.setNeedsLayout()
+                            }
+                        }
+                    }
+                } catch {
+                    print("Error loading image: \(error)")
+                    DispatchQueue.main.async {
+                        cell.imageView?.image = UIImage(systemName: "flame.fill") // Placeholder
+                        cell.setNeedsLayout()
+                    }
+                }
+            }
+        } else {
+            cell.imageView?.image = UIImage(systemName: "flame.fill") // Placeholder if no image URL
+            cell.setNeedsLayout()
+        }
+
         return cell
     }
 
     // MARK: - UITableViewDelegate
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let selectedSimilarRecipe = similarRecipes[indexPath.row]
-        print("SimilarRecipeViewController - tableView didSelectRowAt - Selected recipe ID: \(selectedSimilarRecipe.id), Title: \(selectedSimilarRecipe.title ?? "N/A")")
+        let selectedRecipe = popularRecipes[indexPath.row]
+        print("Selected popular recipe: \(selectedRecipe.title ?? "No Title") with ID: \(selectedRecipe.id)")
         tableView.deselectRow(at: indexPath, animated: true)
-        performSegue(withIdentifier: "next", sender: selectedSimilarRecipe)
+        performSegue(withIdentifier: "next", sender: selectedRecipe)
     }
 
     // MARK: - Navigation
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        print("SimilarRecipeViewController - prepare(for segue:) called with identifier: \(segue.identifier ?? "nil") and sender: \(String(describing: sender))")
         if segue.identifier == "next",
-           let analyzeVC = segue.destination as? RecipeAnalyzeViewsViewController,
-           let selectedRecipe = sender as? SimilarRecipe {
-            analyzeVC.recipeId = selectedRecipe.id
-            print("SimilarRecipeViewController - prepare(for segue:) - Passing recipeId: \(selectedRecipe.id) to RecipeAnalyzeViewsViewController.")
+           let detailVC = segue.destination as? RecipeAnalyzeViewsViewController,
+           let recipeIdToSend = sender as? Int {
+            detailVC.recipeId = recipeIdToSend
         }
     }
-
-    // MARK: - Error Display
 
     private func displayError(_ error: Error) {
         let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)

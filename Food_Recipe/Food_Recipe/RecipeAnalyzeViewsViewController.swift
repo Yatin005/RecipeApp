@@ -18,10 +18,11 @@ class RecipeAnalyzeViewsViewController: UIViewController {
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
 
 
+    
     var recipeId: Int? {
         didSet {
             print("RecipeAnalyzeViewsViewController - recipeId set to: \(recipeId ?? -1)")
-            if isViewLoaded { // Check if the view is loaded before potentially triggering UI updates
+            if isViewLoaded { 
                 loadRecipeDetails(forId: recipeId)
             }
         }
@@ -112,37 +113,13 @@ class RecipeAnalyzeViewsViewController: UIViewController {
             imageView.image = UIImage(systemName: "photo")
         }
     }
-
-    @IBAction func showSimilarRecipesTapped(_ sender: UIButton) {
-        guard let currentRecipeId = self.recipeId else {
-            print("RecipeAnalyzeViewsViewController - Error: recipeId is nil when trying to show similar recipes.")
-            return
-        }
-
-        print("RecipeAnalyzeViewsViewController - showSimilarRecipesTapped - Calling performSegue with recipeId: \(currentRecipeId)")
-        performSegue(withIdentifier: "next", sender: currentRecipeId)
+    @IBAction func popularRecipe(_ sender: Any) {
+        performSegue(withIdentifier: "next", sender: nil)
     }
-
+    
     private func displayError(_ error: Error) {
         let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
-    }
-
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        print("RecipeAnalyzeViewsViewController - prepare(for segue:) called with identifier: \(segue.identifier ?? "nil") and sender: \(String(describing: sender))")
-        if segue.identifier == "next",
-           let similarVC = segue.destination as? SimilarRecipeViewController,
-           let recipeIdToSend = sender as? Int {
-            similarVC.recipeId = recipeIdToSend
-            print("RecipeAnalyzeViewsViewController - prepare(for segue:) - Successfully passed recipeId: \(recipeIdToSend) to SimilarRecipeViewController.")
-        } else {
-            print("RecipeAnalyzeViewsViewController - prepare(for segue:) - Condition not met or cast failed.")
-            if segue.destination is SimilarRecipeViewController {
-                print("RecipeAnalyzeViewsViewController - prepare(for segue:) - Destination VC is SimilarRecipeViewController, but sender was of type: \(String(describing: sender))")
-            } else {
-                print("RecipeAnalyzeViewsViewController - prepare(for segue:) - Destination VC is NOT SimilarRecipeViewController.")
-            }
-        }
     }
 }
