@@ -21,7 +21,7 @@ class RecipeService: RecipeServiceProtocol {
         components.queryItems = [
             URLQueryItem(name: "query", value: query),
             URLQueryItem(name: "apiKey", value: apiKey),
-            URLQueryItem(name: "number", value: "10")
+            URLQueryItem(name: "number", value: "20")
            
         ]
 

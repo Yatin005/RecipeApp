@@ -96,7 +96,7 @@ struct RecipeAnalysisResponse: Codable {
 // MARK: - API Error Enumeration
 enum APIError: Error {
     case invalidURL
-    case requestFailed(Error, statusCode: Int?) // Include status code
+    case requestFailed(Error, statusCode: Int?) 
     case invalidData
     case decodingFailed(Error)
     case apiLimitReached(message: String) // For API limit errors
