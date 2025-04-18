@@ -46,7 +46,7 @@ class RecipeAnalyzeViewsViewController: UIViewController {
     // MARK: - Navigation to Random Recipe
 
     @objc func showRandomRecipe() {
-        performSegue(withIdentifier: "seg2", sender: nil)
+        performSegue(withIdentifier: "seg1", sender: nil)
     }
 
     private func loadRecipeDetails(forId id: Int?) {

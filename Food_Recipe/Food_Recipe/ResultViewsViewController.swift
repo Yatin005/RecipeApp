@@ -106,7 +106,7 @@ class ResultViewsViewController: UIViewController, UISearchBarDelegate, UITableV
         let selectedRecipe = recipes[indexPath.row]
         print("Selected recipe: \(String(describing: selectedRecipe.title)) with ID: \(selectedRecipe.id)")
         tableView.deselectRow(at: indexPath, animated: true)
-        performSegue(withIdentifier: "seg1", sender: selectedRecipe)
+        
     }
 
     // MARK: - Navigation
