@@ -7,7 +7,6 @@
 
 import Foundation
 
-// MARK: - Recipe Search Response Model
 struct RecipeSearchResponse: Codable {
     let results: [Recipe]
     let offset: Int?
@@ -22,7 +21,6 @@ struct Recipe: Codable, Identifiable {
     let imageType: String?
 }
 
-// MARK: - Recipe Detail Model
 struct RecipeDetailModel: Codable {
     let id: Int?
     let title: String?
@@ -92,5 +90,5 @@ enum APIError: Error {
     case requestFailed(Error, statusCode: Int?) 
     case invalidData
     case decodingFailed(Error)
-    case apiLimitReached(message: String) // For API limit errors
+    case apiLimitReached(message: String)
 }

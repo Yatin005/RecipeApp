@@ -34,9 +34,6 @@ class RecipeAnalyzeViewsViewController: UIViewController {
         activityIndicator.isHidden = false
         activityIndicator.startAnimating()
 
-        let randomButton = UIBarButtonItem(title: "Random", style: .plain, target: self, action: #selector(showRandomRecipe))
-        navigationItem.rightBarButtonItem = randomButton
-
         if let id = recipeId {
             loadRecipeDetails(forId: id)
         } else {

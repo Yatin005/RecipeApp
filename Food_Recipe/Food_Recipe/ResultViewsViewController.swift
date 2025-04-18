@@ -96,7 +96,7 @@ class ResultViewsViewController: UIViewController, UISearchBarDelegate, UITableV
             cell.imageView?.image = UIImage(systemName: "photo")
             cell.setNeedsLayout()
         }
-        cell.accessoryType = .disclosureIndicator // Standard indicator to show it's tappable
+        cell.accessoryType = .disclosureIndicator
         return cell
     }
 

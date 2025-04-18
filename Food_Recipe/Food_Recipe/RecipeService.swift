@@ -4,13 +4,11 @@
 //
 //  Created by Yatin Parulkar on 2025-04-07.
 //
-//
-// RecipeService.swift
 import Foundation
 class RecipeService: RecipeServiceProtocol {
    
     private let baseURL = URL(string: "https://api.spoonacular.com/")!
-    private let apiKey = "fb2dc8d18d8d4cbb8d3f1bbd2306c8b9"
+    private let apiKey = "31082f0a28a64dc6b64aa4e7cecb60e1"
 
     func searchRecipes(query: String) async throws -> [Recipe] {
         guard var components = URLComponents(url: baseURL.appendingPathComponent("recipes/complexSearch"), resolvingAgainstBaseURL: true) else {
@@ -20,7 +18,7 @@ class RecipeService: RecipeServiceProtocol {
         components.queryItems = [
             URLQueryItem(name: "query", value: query),
             URLQueryItem(name: "apiKey", value: apiKey),
-            URLQueryItem(name: "number", value: "20")
+            URLQueryItem(name: "number", value: "5")
            
         ]
 
@@ -65,13 +63,6 @@ class RecipeService: RecipeServiceProtocol {
                return randomRecipe
     }
     
-    
-    
-    
-    
-
-
-
 
     private func handleResponse<T: Codable>(data: Data, response: URLResponse, decodingType: T.Type) throws -> T {
         print("--- API Response Analysis ---")
@@ -82,25 +73,20 @@ class RecipeService: RecipeServiceProtocol {
             print("Received a non-HTTP response.")
         }
 
-        // Print the raw data
         print("--- Raw API Response Data ---")
         if let responseString = String(data: data, encoding: .utf8) {
             print(responseString)
         } else {
             print("Unable to decode response data as UTF-8.")
         }
-        print("-----------------------------")
 
-      
         do {
             let decoder = JSONDecoder()
             let decodedObject = try decoder.decode(decodingType, from: data)
             print("Successfully decoded data to \(decodingType)")
             return decodedObject
         } catch {
-            print("--- Decoding Error ---")
             print(error)
-            print("----------------------")
             throw APIError.decodingFailed(error)
         }
     }
