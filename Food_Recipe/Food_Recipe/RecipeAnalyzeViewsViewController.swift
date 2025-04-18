@@ -18,11 +18,10 @@ class RecipeAnalyzeViewsViewController: UIViewController {
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
 
 
-    
     var recipeId: Int? {
         didSet {
             print("RecipeAnalyzeViewsViewController - recipeId set to: \(recipeId ?? -1)")
-            if isViewLoaded { 
+            if isViewLoaded {
                 loadRecipeDetails(forId: recipeId)
             }
         }
@@ -34,14 +33,23 @@ class RecipeAnalyzeViewsViewController: UIViewController {
         title = "Recipe Details"
         activityIndicator.isHidden = false
         activityIndicator.startAnimating()
+
+        let randomButton = UIBarButtonItem(title: "Random", style: .plain, target: self, action: #selector(showRandomRecipe))
+        navigationItem.rightBarButtonItem = randomButton
+
         if let id = recipeId {
             loadRecipeDetails(forId: id)
         } else {
             print("RecipeAnalyzeViewsViewController - viewDidLoad - recipeId is nil initially.")
             activityIndicator.stopAnimating()
             activityIndicator.isHidden = true
-            // Handle the case where recipeId wasn't set before viewDidLoad if needed
         }
+    }
+
+    // MARK: - Navigation to Random Recipe
+
+    @objc func showRandomRecipe() {
+        performSegue(withIdentifier: "seg2", sender: nil)
     }
 
     private func loadRecipeDetails(forId id: Int?) {
@@ -113,10 +121,12 @@ class RecipeAnalyzeViewsViewController: UIViewController {
             imageView.image = UIImage(systemName: "photo")
         }
     }
+
     @IBAction func popularRecipe(_ sender: Any) {
-        performSegue(withIdentifier: "next", sender: nil)
+        performSegue(withIdentifier: "seg2", sender: nil)
     }
-    
+
+
     private func displayError(_ error: Error) {
         let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))

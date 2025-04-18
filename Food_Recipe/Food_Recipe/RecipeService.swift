@@ -8,11 +8,9 @@
 // RecipeService.swift
 import Foundation
 class RecipeService: RecipeServiceProtocol {
-    
-
-    
+   
     private let baseURL = URL(string: "https://api.spoonacular.com/")!
-    private let apiKey = "8741ee128ea74009874c9a33f0506ae8"
+    private let apiKey = "fb2dc8d18d8d4cbb8d3f1bbd2306c8b9"
 
     func searchRecipes(query: String) async throws -> [Recipe] {
         guard var components = URLComponents(url: baseURL.appendingPathComponent("recipes/complexSearch"), resolvingAgainstBaseURL: true) else {
@@ -33,15 +31,6 @@ class RecipeService: RecipeServiceProtocol {
         let (data, response) = try await URLSession.shared.data(from: url)
         return try handleResponse(data: data, response: response, decodingType: RecipeSearchResponse.self).results
     }
-    func fetchPopularRecipes() async throws -> [Recipe] {
-        guard let url = URL(string: "\(baseURL)recipes/complexSearch?apiKey=\(apiKey)&sort=popularity&number=20") else {
-                    throw APIError.invalidURL
-                }
-
-                let (data, response) = try await URLSession.shared.data(from: url)
-                let popularRecipeResponse = try handleResponse(data: data, response: response, decodingType: RecipeSearchResponse.self)
-                return popularRecipeResponse.results
-    }
     
 
     func getRecipeInformation(id: Int) async throws -> RecipeDetailModel {
@@ -61,6 +50,27 @@ class RecipeService: RecipeServiceProtocol {
         let (data, response) = try await URLSession.shared.data(from: url)
         return try handleResponse(data: data, response: response, decodingType: [RecipeDetailModel].self)
     }
+    func fetchRandomRecipe() async throws -> RecipeDetailModel {
+        guard let url = URL(string: "\(baseURL)recipes/random?apiKey=\(apiKey)&number=1") else {
+                   throw APIError.invalidURL
+               }
+               let (data, response) = try await URLSession.shared.data(from: url)
+               struct RandomRecipeResponse: Codable {
+                   let recipes: [RecipeDetailModel]
+               }
+               let decodedResponse = try handleResponse(data: data, response: response, decodingType: RandomRecipeResponse.self)
+               guard let randomRecipe = decodedResponse.recipes.first else {
+                   throw APIError.invalidData
+               }
+               return randomRecipe
+    }
+    
+    
+    
+    
+    
+
+
 
 
     private func handleResponse<T: Codable>(data: Data, response: URLResponse, decodingType: T.Type) throws -> T {

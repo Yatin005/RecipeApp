@@ -74,14 +74,7 @@ struct ExtendedIngredient: Codable {
     let unit: String?
 }
 
-struct SimilarRecipe: Codable {
-    let id: Int
-    let title: String?
-    let imageType: String?
-    let readyInMinutes: Int?
-    let servings: Int?
-    let sourceUrl: String?
-}
+
 
 struct RecipeAnalysisResponse: Codable {
     let id: Int?

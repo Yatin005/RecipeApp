@@ -12,5 +12,6 @@ protocol RecipeServiceProtocol: AnyObject {
     func searchRecipes(query: String) async throws -> [Recipe]
         func getRecipeInformation(id: Int) async throws -> RecipeDetailModel
         func fetchRecipeListByIds(ids: [Int]) async throws -> [RecipeDetailModel]
-    func fetchPopularRecipes() async throws -> [Recipe]
+    func fetchRandomRecipe() async throws -> RecipeDetailModel
+    
     }
