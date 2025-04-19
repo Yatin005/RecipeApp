@@ -13,8 +13,6 @@ class ResultViewsViewController: UIViewController, UISearchBarDelegate, UITableV
     
     @IBOutlet weak var searchBar: UISearchBar!
 
-
-    
     private var recipeService: RecipeServiceProtocol!
     private var recipes: [Recipe] = []
 
@@ -41,16 +39,21 @@ class ResultViewsViewController: UIViewController, UISearchBarDelegate, UITableV
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         guard let query = searchBar.text, !query.isEmpty else { return }
         searchBar.resignFirstResponder()
+        print("searchBarSearchButtonClicked: \(query)")
         fetchRecipes(query: query)
     }
 
     private func fetchRecipes(query: String) {
+        print("fetchRecipes called with query: \(query)")
         Task {
             do {
                 let fetchedRecipes = try await recipeService.searchRecipes(query: query)
+                print("fetchRecipes - fetchedRecipes count: \(fetchedRecipes.count)")
                 DispatchQueue.main.async {
                     self.recipes = fetchedRecipes
+                    print("fetchRecipes - self.recipes count after update: \(self.recipes.count)")
                     self.resultView.reloadData()
+                    print("fetchRecipes - resultView reloaded")
                 }
             } catch {
                 DispatchQueue.main.async {
@@ -63,7 +66,9 @@ class ResultViewsViewController: UIViewController, UISearchBarDelegate, UITableV
     // MARK: - UITableViewDataSource
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return recipes.count
+        let rowCount = recipes.count
+        print("numberOfRowsInSection: \(rowCount)") 
+        return rowCount
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -106,7 +111,7 @@ class ResultViewsViewController: UIViewController, UISearchBarDelegate, UITableV
         let selectedRecipe = recipes[indexPath.row]
         print("Selected recipe: \(String(describing: selectedRecipe.title)) with ID: \(selectedRecipe.id)")
         tableView.deselectRow(at: indexPath, animated: true)
-        
+        performSegue(withIdentifier: "seg1", sender: selectedRecipe) 
     }
 
     // MARK: - Navigation

@@ -8,7 +8,7 @@ import Foundation
 class RecipeService: RecipeServiceProtocol {
    
     private let baseURL = URL(string: "https://api.spoonacular.com/")!
-    private let apiKey = "b13db0d3fab64bcfb1da149438390d53"
+    private let apiKey = "a9e63ae4a9bb4fb7b9bbc7cb7ee44113"
 
     func searchRecipes(query: String) async throws -> [Recipe] {
         guard var components = URLComponents(url: baseURL.appendingPathComponent("recipes/complexSearch"), resolvingAgainstBaseURL: true) else {
@@ -18,7 +18,7 @@ class RecipeService: RecipeServiceProtocol {
         components.queryItems = [
             URLQueryItem(name: "query", value: query),
             URLQueryItem(name: "apiKey", value: apiKey),
-            URLQueryItem(name: "number", value: "3")
+            URLQueryItem(name: "number", value: "10")
            
         ]
 

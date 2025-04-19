@@ -10,8 +10,8 @@ import Foundation
 
 protocol RecipeServiceProtocol: AnyObject {
     func searchRecipes(query: String) async throws -> [Recipe]
-        func getRecipeInformation(id: Int) async throws -> RecipeDetailModel
-        func fetchRecipeListByIds(ids: [Int]) async throws -> [RecipeDetailModel]
+    func getRecipeInformation(id: Int) async throws -> RecipeDetailModel
+    func fetchRecipeListByIds(ids: [Int]) async throws -> [RecipeDetailModel]
     func fetchRandomRecipe() async throws -> RecipeDetailModel
     
     }
